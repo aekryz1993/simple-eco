@@ -9,4 +9,6 @@ export const PageContainer = styled.div.attrs({
   max-width: ${(props) => (props.fullWidth ? null : "90%")};
   padding: ${(props) => (props.fullWidth ? 0 : "2rem")};
   gap: ${(props) => (props.grid ? "1rem" : null)};
+  row-gap: ${(props) => (props.grid ? "3rem" : null)};
+  align-content: ${(props) => (props.grid ? "center" : null)};
 `;

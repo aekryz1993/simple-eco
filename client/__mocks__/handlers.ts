@@ -1,5 +1,5 @@
 import { graphql } from "msw";
-import { fashionNews } from "./mocks";
+import { fashionNews, products } from "./mocks";
 
 export const handlers = [
   graphql.query("GetFashionNews", (_req, res, ctx) => {
@@ -9,13 +9,11 @@ export const handlers = [
       })
     );
   }),
+  graphql.query("GetProducts", (_req, res, ctx) => {
+    return res(
+      ctx.data({
+        products,
+      })
+    );
+  }),
 ];
-
-// query GetFashionNews {
-//   fashionNews {
-//     id
-//     img
-//     title
-//     info
-//   }
-// }

@@ -1,9 +1,10 @@
 import { getFashionNewsItems } from "./fashionNews";
-import { getProductItems } from "./products";
+import { getProductItems, getProductItem } from "./products";
 
 const data = {
   getFashionNewsItems,
   getProductItems,
+  getProductItem,
 };
 
 export default data;
