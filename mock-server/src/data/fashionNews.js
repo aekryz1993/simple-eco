@@ -8,7 +8,7 @@ export class FashionNewsItem {
 
   async fetchRandomImg() {
     const response = await axios.get(
-      "https://loremflickr.com/p/900/400/fashion,girl,pink,clothing/all"
+      "https://source.unsplash.com/random/2000x1000/?women&clothing&fashion&background"
     );
     return response.request.res.responseUrl;
   }

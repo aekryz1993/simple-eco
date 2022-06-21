@@ -1,3 +1,5 @@
+import { useCallback, useReducer } from "react";
+import { getInitialState } from "./helper";
 import { CarouselAction, CarouselState, Dir } from "./types";
 
 export function reducer(
@@ -32,3 +34,22 @@ export function reducer(
 
   return (actions[action.type] || actions["DEFAULT"])();
 }
+
+export const useSlide = (numItems: number) => {
+  const [state, dispatch] = useReducer(reducer, getInitialState());
+
+  const slide = useCallback(
+    (dir: Dir) => {
+      dispatch({ type: dir, numItems });
+      setTimeout(() => {
+        dispatch({ type: Dir.STOP });
+      }, 50);
+    },
+    [numItems]
+  );
+
+  return {
+    slide,
+    state,
+  };
+};

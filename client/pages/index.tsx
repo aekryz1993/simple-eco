@@ -7,17 +7,11 @@ import client from "apollo-client";
 import Card from "components/product-card";
 import PageContainer from "components/layout/page-container";
 import { Fragment } from "react";
+import { ProductType } from "types";
 
 interface FashionNewsType {
   id: number | string;
   img: string;
-}
-
-export interface ProductType {
-  id: number;
-  name: string;
-  price: string;
-  main_image: string;
 }
 
 export const FASHION_NEWS = gql`
@@ -42,19 +36,19 @@ export const PRODUCTS = gql`
 
 const Home: NextPage<{
   fashionNews: FashionNewsType[];
-  products: ProductType[];
+  products: Pick<ProductType, "id" | "name" | "price" | "main_image">[];
 }> = ({ fashionNews, products }) => {
   return (
     <Fragment>
       <Layout title="Demo Eco" fullWidth>
-        <section className="max-w-[90%] h-1/2 m-auto mt-10">
+        <section className="w-full max-w-[1500px] mx-auto h-80 lg:h-[25rem]">
           <Carousel>
             {fashionNews.map((item) => (
               <FashionNewsItem key={item.id} item={item} />
             ))}
           </Carousel>
         </section>
-        <section className="w-[80%] m-auto mt-32">
+        <section className="w-[80%] m-auto mt-16">
           <PageContainer grid fullWidth>
             {products.map((product) => (
               <Card key={product.id} product={product} />

@@ -5,24 +5,28 @@ import data from "./data";
 import { resolvers } from "./resolvers";
 
 async function startServer() {
-  const fashionNewsItems = await data.getFashionNewsItems();
-  const productItems = await data.getProductItems();
-  const productItem = data.getProductItem(productItems);
+  try {
+    const fashionNewsItems = await data.getFashionNewsItems();
+    const productItems = await data.getProductItems();
+    const productItem = data.getProductItem(productItems);
 
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers: resolvers({ productItem }),
-    mocks: mocks({ fashionNewsItems, productItems }),
-    mockEntireSchema: false,
-  });
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers: resolvers({ productItem }),
+      mocks: mocks({ fashionNewsItems, productItems }),
+      mockEntireSchema: false,
+    });
 
-  server.listen().then(() => {
-    console.log(`
+    server.listen().then(() => {
+      console.log(`
       🚀  Server is running!
       🔉  Listening on port 4000
       📭  Query at https://studio.apollographql.com/dev
     `);
-  });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 startServer();

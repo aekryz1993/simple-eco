@@ -10,4 +10,7 @@ export interface CarouselState {
   dir: Dir;
 }
 
-export type CarouselAction = { type: Dir; numItems?: number };
+export interface CarouselAction {
+  type: Dir;
+  numItems?: number;
+}

@@ -3,23 +3,8 @@ import Layout from "components/layout";
 import client from "apollo-client";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Fragment } from "react";
-import { ProductType } from "..";
-import { size } from "styles";
-
-export enum Size {
-  S = "S",
-  M = "M",
-  L = "L",
-  XL = "XL",
-  XXL = "XXL",
-}
-
-export interface FullProductType extends ProductType {
-  description: string;
-  full_description: string;
-  images_list: string[];
-  size: Size[];
-}
+import ProductItem from "components/product";
+import { ProductType } from "types";
 
 export const PRODUCT = gql`
   query GetProduct($productId: ID!) {
@@ -36,11 +21,13 @@ export const PRODUCT = gql`
   }
 `;
 
-const Product = ({ product }: { product: FullProductType }) => {
+const Product = ({ product }: { product: ProductType }) => {
   return (
     <Fragment>
       <Layout title={product.name} fullWidth>
-        <main className={`w-full md:w-[80%] mx-auto my-10`}></main>
+        <main className="w-full max-w-7xl mx-auto my-10 px-2">
+          <ProductItem product={product} />
+        </main>
       </Layout>
     </Fragment>
   );

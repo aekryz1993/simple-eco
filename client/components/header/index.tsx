@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Link } from "styles";
 import {
   Container,
   HeaderBar,
@@ -13,15 +14,17 @@ const Header = () => {
     <HeaderBar>
       <Container>
         <HomeButtonContainer>
-          <HomeButton>
-            <LogoContainer>
-              <Image src="/logo.png" alt="LOGO" width={60} height={60} />
-            </LogoContainer>
-            <Title>
-              <h3>Simple Eco</h3>
-              <div>Clothing store</div>
-            </Title>
-          </HomeButton>
+          <Link href="/">
+            <HomeButton>
+              <LogoContainer>
+                <Image src="/logo.png" alt="LOGO" width={60} height={60} />
+              </LogoContainer>
+              <Title>
+                <h3>Simple Eco</h3>
+                <div>Clothing store</div>
+              </Title>
+            </HomeButton>
+          </Link>
         </HomeButtonContainer>
       </Container>
     </HeaderBar>

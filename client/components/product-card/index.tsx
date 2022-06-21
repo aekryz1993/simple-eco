@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ProductType } from "pages";
+import { ProductType } from "types";
 import {
   CardContainer,
   ImageContainer,
