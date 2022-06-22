@@ -7,13 +7,15 @@ import { CarouselState, Dir } from "./types";
 const Slider = ({
   children,
   slider,
+  nav,
   slide,
   state,
   numItems,
 }: {
   children?: React.ReactNode;
   slider?: boolean;
-  slide: (dir: Dir) => void;
+  nav?: boolean;
+  slide: (dir: Dir, index?: number) => void;
   state: CarouselState;
   numItems: number;
 }) => {

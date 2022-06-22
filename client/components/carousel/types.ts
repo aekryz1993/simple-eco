@@ -2,6 +2,7 @@ export enum Dir {
   PREV = "PREV",
   NEXT = "NEXT",
   STOP = "STOP",
+  ON_CHANGE = "ON_CHANGE",
 }
 
 export interface CarouselState {
@@ -13,4 +14,5 @@ export interface CarouselState {
 export interface CarouselAction {
   type: Dir;
   numItems?: number;
+  index?: number;
 }

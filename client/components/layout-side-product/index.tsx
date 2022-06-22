@@ -11,22 +11,20 @@ const LayoutSideProduct: React.FC<{ product: ProductProps }> = ({
 }) => {
   return (
     <ProductOrderProvider>
-      <div className="flex flex-col gap-8 max-w-md">
+      <div className="flex flex-col gap-y-10 max-w-md">
         <div className="leading-loose">
           <Title>{product.name}</Title>
           <Price>{product.price}</Price>
         </div>
-        <div className="leading-relaxed max-w-md">
+        <div className="leading-relaxed max-w-md flex flex-col gap-4">
           <Description>{product.description}</Description>
-        </div>
-        <div className="flex flex-col gap-6">
           <ProductSize sizes={product.size} />
-          <div className="flex gap-8">
-            <QuantityProduct />
-            <OrderButton>
-              <TextButton>Order Now</TextButton>
-            </OrderButton>
-          </div>
+        </div>
+        <div className="flex gap-8">
+          <QuantityProduct />
+          <OrderButton>
+            <TextButton>Order Now</TextButton>
+          </OrderButton>
         </div>
       </div>
     </ProductOrderProvider>

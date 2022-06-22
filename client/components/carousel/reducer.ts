@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react";
+import { useCallback, useReducer, useRef } from "react";
 import { getInitialState } from "./helper";
 import { CarouselAction, CarouselState, Dir } from "./types";
 
@@ -25,10 +25,19 @@ export function reducer(
     sliding: false,
   });
 
+  const onChange = () => ({
+    ...state,
+    pos:
+      action.index === 0
+        ? (action.numItems as number) - 1
+        : (action.index as number) - 1,
+  });
+
   const actions = {
     PREV: prevAction,
     NEXT: nextAction,
     STOP: stopAction,
+    ON_CHANGE: onChange,
     DEFAULT: () => state,
   };
 
@@ -37,11 +46,14 @@ export function reducer(
 
 export const useSlide = (numItems: number) => {
   const [state, dispatch] = useReducer(reducer, getInitialState());
+  const timerId = useRef<NodeJS.Timeout>();
 
   const slide = useCallback(
-    (dir: Dir) => {
-      dispatch({ type: dir, numItems });
-      setTimeout(() => {
+    (dir: Dir, index?: number) => {
+      if (index !== undefined && index >= 0)
+        dispatch({ type: dir, index, numItems });
+      else dispatch({ type: dir, numItems });
+      timerId.current = setTimeout(() => {
         dispatch({ type: Dir.STOP });
       }, 50);
     },
@@ -51,5 +63,6 @@ export const useSlide = (numItems: number) => {
   return {
     slide,
     state,
+    timerId,
   };
 };

@@ -1,7 +1,6 @@
 import { Children, useEffect, useRef } from "react";
 import Slider from "./slider";
 import { CarouselState, Dir } from "./types";
-import { useSlide } from "./useSlide";
 
 const AutoSlide = ({
   children,

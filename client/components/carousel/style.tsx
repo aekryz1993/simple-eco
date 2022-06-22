@@ -86,3 +86,46 @@ export const CarouselSlot = styled.div.attrs<{ slider?: string | undefined }>(
   opacity: ${(props) => !props.slider && (props.index === props.pos ? 1 : 0.5)};
   order: ${(props) => props.slider && props.order};
 `;
+
+export const SliderNavContainer = styled.div.attrs({
+  className: "flex flex-col md:flex-row gap-2 md:gap-0 h-[30rem]",
+})``;
+
+export const ImagesNavigator = styled.div.attrs({
+  className: "order-2 md:order-1",
+})`
+  flex-basis: 15%;
+`;
+
+export const MainImage = styled.div.attrs({
+  className: "order-1 md:order-2",
+})`
+  flex-basis: 85%;
+`;
+
+export const ImagesContainer = styled.div.attrs({
+  className:
+    "flex flex-row gap-4 md:flex-col py-4 md:px-4 md:py-0 items-center",
+})``;
+
+export const ImageContainer = styled.div.attrs({
+  className: "relative w-16 h-16",
+})<{ pos: number; index: number; numItems: number }>`
+  cursor: pointer;
+  outline-width: ${(props) =>
+    props.pos + 1 === props.index ||
+    props.pos === props.index + props.numItems - 1
+      ? "3px"
+      : "0px"};
+  outline-color: ${(props) =>
+    props.pos + 1 === props.index ||
+    props.pos === props.index + props.numItems - 1
+      ? props.theme.colors.primary
+      : "inherit"};
+  outline-style: ${(props) =>
+    props.pos + 1 === props.index ||
+    props.pos === props.index + props.numItems - 1
+      ? "solid"
+      : "inherit"};
+  border-radius: 0.1rem;
+`;
