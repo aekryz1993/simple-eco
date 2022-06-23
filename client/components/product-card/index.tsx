@@ -9,7 +9,11 @@ import {
   Title,
 } from "./style";
 
-const Card = ({ product }: { product: ProductType }) => (
+const Card = ({
+  product,
+}: {
+  product: Pick<ProductType, "id" | "name" | "price" | "main_image">;
+}) => (
   <LinkCard href={`/products/${product.id}`}>
     <CardContainer>
       <ImageContainer>

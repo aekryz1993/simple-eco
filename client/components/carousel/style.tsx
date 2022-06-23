@@ -2,6 +2,7 @@
 import styled from "styled-components";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline";
 import { Dir } from "./types";
+import { lastMove } from "./helper";
 
 // const Helper = forwardRef(
 //   (
@@ -22,25 +23,20 @@ import { Dir } from "./types";
 
 const SlideButtonHelper = (props: {
   position: "left" | "right";
+  xMargin?: number;
   className: string;
   onClick: () => void;
 }) => {
   return props.position === "left" ? (
-    <ArrowLeftIcon
-      className={`${props.className} left-[1rem]`}
-      onClick={props.onClick}
-    />
+    <ArrowLeftIcon className={`${props.className}`} onClick={props.onClick} />
   ) : (
-    <ArrowRightIcon
-      className={`${props.className} right-[1rem]`}
-      onClick={props.onClick}
-    />
+    <ArrowRightIcon className={`${props.className}`} onClick={props.onClick} />
   );
 };
 
 export const SlideButton = styled(SlideButtonHelper).attrs({
   className: "absolute cursor-pointer w-8 h-8 z-10",
-})`
+})<{ position: "left" | "right" }>`
   color: ${(props) => props.theme.colors.primary};
   border-radius: 50%;
   box-shadow: 1px 1px 10px 1px ${(props) => props.theme.colors.primary};
@@ -48,43 +44,81 @@ export const SlideButton = styled(SlideButtonHelper).attrs({
   padding: 0.3rem;
   transform: translateY(-50%);
   background-color: rgba(255, 255, 255, 0.3);
+  left: ${(props) =>
+    props.position === "left" && `${props.xMargin ? props.xMargin + 1 : 1}rem`};
+  right: ${(props) =>
+    props.position === "right" &&
+    `${props.xMargin ? props.xMargin + 1 : 1}rem`};
 `;
 
 export const Main = styled.main.attrs<{
-  slider?: string | undefined;
-  sliding: string | undefined;
+  slider?: string;
+  sliding?: string;
+  split?: number;
 }>((props) => ({
-  className: `flex nowrap w-full ${!props.slider ? "h-full" : ""}`,
+  className: `flex nowrap w-full ${props.sliding ? "" : "transition-slider"} ${
+    !props.slider ? "h-full" : ""
+  } ${props.split ? "transition-slider" : ""}`,
 }))<{
   slider?: string | undefined;
   sliding: string | undefined;
+  split?: number;
+  pos?: number;
+  restItems?: number;
+  numItems?: number;
+  xMargin?: number;
   dir: Dir;
 }>`
-  transition: ${(props) => (props.sliding ? "none" : "transform 1s ease")};
   transform: ${(props) => {
-    if (props.slider && !props.sliding) return "translateX(calc(-100%))";
-    if (props.slider && props.dir === Dir.PREV)
+    if (!props.split && props.slider && !props.sliding)
+      return "translateX(calc(-100%))";
+    if (!props.split && props.slider && props.dir === Dir.PREV)
       return "translateX(calc(2 * (-100%)))";
-    if (props.slider) return "translateX(0%)";
+    if (!props.split && props.slider) return "translateX(0%)";
+    if (
+      props.split &&
+      props.pos &&
+      props.numItems &&
+      props.restItems &&
+      props.xMargin
+    ) {
+      return props.pos === Math.floor((props.numItems - 1) / props.split)
+        ? `translateX(${lastMove({
+            restItems: props.restItems,
+            split: props.split,
+            xMargin: props.xMargin,
+            pos: props.pos,
+          })})`
+        : `translateX(-${100 * props.pos}%)`;
+    }
   }};
 `;
 
-export const CarouselSlot = styled.div.attrs<{ slider?: string | undefined }>(
-  (props) => ({
-    className: `${
-      !props.slider ? "transition-opacity duration-1000" : "relative"
-    }`,
-  })
-)<{
+export const CarouselSlot = styled.div.attrs<{
+  slider?: string;
+  split?: number;
+}>((props) => ({
+  className: `${
+    !props.slider ? "transition-opacity duration-1000" : "relative"
+  }`,
+}))<{
   pos: number;
   index: number;
   order?: number;
-  slider?: string | undefined;
+  split?: number;
+  xMargin?: number;
+  slider?: string;
 }>`
-  flex: 0 0 100%;
-  transform: ${(props) => !props.slider && `translateX(${-100 * props.pos}%)`};
+  flex: 0 0
+    ${(props) =>
+      props.split && props.xMargin
+        ? `calc(100% / ${props.split} - ${2 * props.xMargin}rem)`
+        : "100%"};
+  transform: ${(props) => !props.slider && `translateX(-${100 * props.pos}%)`};
   opacity: ${(props) => !props.slider && (props.index === props.pos ? 1 : 0.5)};
   order: ${(props) => props.slider && props.order};
+  margin-right: ${(props) => (props.xMargin ? `${props.xMargin}rem` : 0)};
+  margin-left: ${(props) => (props.xMargin ? `${props.xMargin}rem` : 0)};
 `;
 
 export const SliderNavContainer = styled.div.attrs({

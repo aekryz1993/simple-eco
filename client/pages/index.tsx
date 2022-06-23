@@ -8,6 +8,7 @@ import Card from "components/product-card";
 import PageContainer from "components/layout/page-container";
 import { Fragment } from "react";
 import { ProductType } from "types";
+import NewArrivals from "components/new-arrivals";
 
 interface FashionNewsType {
   id: number | string;
@@ -41,20 +42,23 @@ const Home: NextPage<{
   return (
     <Fragment>
       <Layout title="Demo Eco" fullWidth>
-        <section className="w-full max-w-[1500px] mx-auto h-80 lg:h-[25rem]">
+        <section className="w-full mx-auto h-80">
           <Carousel>
             {fashionNews.map((item) => (
               <FashionNewsItem key={item.id} item={item} />
             ))}
           </Carousel>
         </section>
-        <section className="w-[80%] m-auto mt-16">
+        <section className="w-[90%] max-w-screen-xl mx-auto h-96 my-16">
+          <NewArrivals products={products} />
+        </section>
+        {/* <section className="w-[90%] max-w-screen-xl m-auto">
           <PageContainer grid fullWidth>
             {products.map((product) => (
               <Card key={product.id} product={product} />
             ))}
           </PageContainer>
-        </section>
+        </section> */}
       </Layout>
     </Fragment>
   );
@@ -71,7 +75,7 @@ export async function getStaticProps() {
   return {
     props: {
       fashionNews: fashionNewsResponse.data.fashionNews,
-      products: productsResponse.data.products.slice(0, 8),
+      products: productsResponse.data.products.slice(0, 7),
     },
   };
 }

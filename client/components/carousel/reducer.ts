@@ -44,8 +44,15 @@ export function reducer(
   return (actions[action.type] || actions["DEFAULT"])();
 }
 
-export const useSlide = (numItems: number) => {
-  const [state, dispatch] = useReducer(reducer, getInitialState());
+export const useSlide = (
+  numItems: number,
+  slider?: boolean,
+  split?: number
+) => {
+  const [state, dispatch] = useReducer(
+    reducer,
+    getInitialState(slider && !split ? numItems - 1 : 0)
+  );
   const timerId = useRef<NodeJS.Timeout>();
 
   const slide = useCallback(
