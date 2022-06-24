@@ -3,28 +3,45 @@ import styled from "styled-components";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline";
 import { Dir } from "./types";
 import { lastMove } from "./helper";
+import { forwardRef } from "react";
 
-// const Helper = forwardRef(
-//   (
-//     props: { children: React.ReactNode; className: string },
-//     ref?: React.Ref<HTMLDivElement>
-//   ) => (
-//     <div className={props.className} ref={ref}>
-//       {props.children}
-//     </div>
-//   )
-// );
+const Helper = forwardRef(
+  (
+    props: {
+      children: React.ReactNode;
+      slider?: string;
+      split?: number;
+    },
+    ref?: React.Ref<HTMLDivElement>
+  ) => (
+    <div {...props} ref={ref}>
+      {props.children}
+    </div>
+  )
+);
 
-// Helper.displayName = "Helper";
+Helper.displayName = "Helper";
 
-// export const SliderContainer = styled(Helper).attrs({
-//   className: "flex ",
-// })``;
+export const SliderContainer = styled(Helper).attrs<{
+  slider?: string;
+  split?: number;
+}>((props) => ({
+  className: `${
+    props.slider ? "flex h-full" : "w-full h-full"
+  } relative overflow-hidden`,
+}))`
+  @media screen and (max-width: 600px) {
+    overflow-x: ${(props) => props.split && "auto"};
+  }
+`;
 
 const SlideButtonHelper = (props: {
   position: "left" | "right";
-  xMargin?: number;
   className: string;
+  xMargin?: number;
+  pos?: number;
+  numItems?: number;
+  split?: number;
   onClick: () => void;
 }) => {
   return props.position === "left" ? (
@@ -36,7 +53,13 @@ const SlideButtonHelper = (props: {
 
 export const SlideButton = styled(SlideButtonHelper).attrs({
   className: "absolute cursor-pointer w-8 h-8 z-10",
-})<{ position: "left" | "right" }>`
+})<{
+  position: "left" | "right";
+  pos?: number;
+  xMargin?: number;
+  numItems?: number;
+  split?: number;
+}>`
   color: ${(props) => props.theme.colors.primary};
   border-radius: 50%;
   box-shadow: 1px 1px 10px 1px ${(props) => props.theme.colors.primary};
@@ -45,10 +68,25 @@ export const SlideButton = styled(SlideButtonHelper).attrs({
   transform: translateY(-50%);
   background-color: rgba(255, 255, 255, 0.3);
   left: ${(props) =>
-    props.position === "left" && `${props.xMargin ? props.xMargin + 1 : 1}rem`};
+    props.position === "left" && `${props.xMargin ? props.xMargin + 1 : 1}%`};
   right: ${(props) =>
-    props.position === "right" &&
-    `${props.xMargin ? props.xMargin + 1 : 1}rem`};
+    props.position === "right" && `${props.xMargin ? props.xMargin + 1 : 1}%`};
+  display: ${(props) => {
+    if (props.xMargin && (props.pos || props.pos === 0)) {
+      if (props.position === "left" && props.pos <= 0) return "none";
+      if (
+        props.position === "right" &&
+        props.numItems &&
+        props.split &&
+        props.pos >= Math.floor((props.numItems - 1) / props.split)
+      )
+        return "none";
+    }
+  }};
+
+  @media screen and (max-width: 600px) {
+    display: ${(props) => props.xMargin && "none"};
+  }
 `;
 
 export const Main = styled.main.attrs<{
@@ -60,7 +98,7 @@ export const Main = styled.main.attrs<{
     !props.slider ? "h-full" : ""
   } ${props.split ? "transition-slider" : ""}`,
 }))<{
-  slider?: string | undefined;
+  slider?: string;
   sliding: string | undefined;
   split?: number;
   pos?: number;
@@ -69,6 +107,10 @@ export const Main = styled.main.attrs<{
   xMargin?: number;
   dir: Dir;
 }>`
+  @media screen and (max-width: 600px) {
+    transition: ${(props) => props.split && props.pos && `none`};
+    transform: ${(props) => props.split && props.pos && `none`};
+  }
   transform: ${(props) => {
     if (!props.split && props.slider && !props.sliding)
       return "translateX(calc(-100%))";
@@ -109,16 +151,23 @@ export const CarouselSlot = styled.div.attrs<{
   xMargin?: number;
   slider?: string;
 }>`
+  @media screen and (max-width: 600px) {
+    flex: 0 0
+      ${(props) =>
+        props.split && props.xMargin
+          ? `calc(100% - ${2 * props.xMargin}%)`
+          : "100%"};
+  }
   flex: 0 0
     ${(props) =>
       props.split && props.xMargin
-        ? `calc(100% / ${props.split} - ${2 * props.xMargin}rem)`
+        ? `calc(${100 / props.split}% - ${2 * props.xMargin}%)`
         : "100%"};
   transform: ${(props) => !props.slider && `translateX(-${100 * props.pos}%)`};
   opacity: ${(props) => !props.slider && (props.index === props.pos ? 1 : 0.5)};
   order: ${(props) => props.slider && props.order};
-  margin-right: ${(props) => (props.xMargin ? `${props.xMargin}rem` : 0)};
-  margin-left: ${(props) => (props.xMargin ? `${props.xMargin}rem` : 0)};
+  margin-right: ${(props) => (props.xMargin ? `${props.xMargin}%` : 0)};
+  margin-left: ${(props) => (props.xMargin ? `${props.xMargin}%` : 0)};
 `;
 
 export const SliderNavContainer = styled.div.attrs({

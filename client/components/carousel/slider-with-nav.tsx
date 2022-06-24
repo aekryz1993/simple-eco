@@ -40,7 +40,7 @@ const SliderWithNav = ({
         </ImagesContainer>
       </ImagesNavigator>
       <MainImage>
-        <Slider slider nav slide={slide} state={state} numItems={numItems}>
+        <Slider slider slide={slide} state={state} numItems={numItems}>
           {children}
         </Slider>
       </MainImage>

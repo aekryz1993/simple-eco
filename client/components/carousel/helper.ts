@@ -24,7 +24,7 @@ export const lastMove = ({
   const prevTranslateX = -100 * (pos - 1);
   const restItemsWidth = `calc((${100 / split}% - ${
     2 * xMargin
-  }rem) * ${restItems})`;
-  const restMargins = `${xMargin * 2 * restItems}rem`;
+  }%) * ${restItems})`;
+  const restMargins = `${xMargin * 2 * restItems}%`;
   return `calc(${prevTranslateX}% - (${restItemsWidth} + ${restMargins}))`;
 };

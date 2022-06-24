@@ -49,16 +49,16 @@ const Home: NextPage<{
             ))}
           </Carousel>
         </section>
-        <section className="w-[90%] max-w-screen-xl mx-auto h-96 my-16">
+        <section className="w-[90%] max-w-screen-xl mx-auto h-auto my-16">
           <NewArrivals products={products} />
         </section>
-        {/* <section className="w-[90%] max-w-screen-xl m-auto">
+        <section className="w-[90%] max-w-screen-xl m-auto">
           <PageContainer grid fullWidth>
             {products.map((product) => (
               <Card key={product.id} product={product} />
             ))}
           </PageContainer>
-        </section> */}
+        </section>
       </Layout>
     </Fragment>
   );

@@ -1,7 +1,7 @@
 import { Children, useMemo } from "react";
 import { useSwipeable } from "react-swipeable";
 import { getOrder } from "./helper";
-import { CarouselSlot, Main, SlideButton } from "./style";
+import { CarouselSlot, Main, SlideButton, SliderContainer } from "./style";
 import { CarouselState, Dir } from "./types";
 
 const Slider = ({
@@ -21,15 +21,6 @@ const Slider = ({
   split?: number;
   xMargin?: number;
 }) => {
-  const handlers = slider
-    ? useSwipeable({
-        onSwipedLeft: () => slide(Dir.NEXT),
-        onSwipedRight: () => slide(Dir.PREV),
-        // preventDefaultTouchmoveEvent: true,
-        trackMouse: true,
-      })
-    : {};
-
   const handleLeftBtn = () => {
     if (split) return state.pos > 0 && slide(Dir.PREV);
     return slide(Dir.PREV);
@@ -45,17 +36,32 @@ const Slider = ({
     ? useMemo(() => numItems - Math.floor(numItems / split) * split, [])
     : 0;
 
+  const handlers = slider
+    ? useSwipeable({
+        onSwipedLeft: handleRightBtn,
+        onSwipedRight: handleLeftBtn,
+        trackMouse: true,
+      })
+    : {};
+
   return (
-    <div
-      className={`${
-        slider ? "flex h-full" : "w-full h-full"
-      } relative overflow-hidden ml-[-${xMargin}rem]`}
+    <SliderContainer
+      slider={slider ? slider.toString() : undefined}
+      split={split}
       {...handlers}
     >
-      <SlideButton position="left" xMargin={xMargin} onClick={handleLeftBtn} />
+      <SlideButton
+        position="left"
+        xMargin={xMargin}
+        pos={state.pos}
+        onClick={handleLeftBtn}
+      />
       <SlideButton
         position="right"
         xMargin={xMargin}
+        pos={state.pos}
+        numItems={numItems}
+        split={split}
         onClick={handleRightBtn}
       />
       <Main
@@ -85,7 +91,7 @@ const Slider = ({
           </CarouselSlot>
         ))}
       </Main>
-    </div>
+    </SliderContainer>
   );
 };
 

@@ -6,7 +6,7 @@ import {
   LinkCard,
   Price,
   TextContainer,
-  Title,
+  ProductName,
 } from "./style";
 
 const Card = ({
@@ -25,7 +25,7 @@ const Card = ({
         />
       </ImageContainer>
       <TextContainer>
-        <Title>{product.name}</Title>
+        <ProductName>{product.name}</ProductName>
         <Price>{product.price}</Price>
       </TextContainer>
     </CardContainer>
