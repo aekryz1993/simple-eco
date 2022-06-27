@@ -1,4 +1,4 @@
-const { gql } = require("apollo-server");
+const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   scalar Date
@@ -8,8 +8,22 @@ const typeDefs = gql`
     fashionNews: [FashionNewsItem!]!
     "Get products array"
     products: [Product!]!
+    "Get Orders"
+    orders: [Order!]!
     "Get product"
     product(id: ID!): Product!
+  }
+
+  type Mutation {
+    addOrder(
+      consumer: String!
+      phone: String!
+      orderList: [InputOrderListItem!]!
+    ): Order!
+  }
+
+  type Subscription {
+    orderAdded: Order!
   }
 
   enum Size {
@@ -18,6 +32,18 @@ const typeDefs = gql`
     L
     XL
     XXL
+  }
+
+  input InputOrderListItem {
+    productId: ID!
+    quantity: Int!
+    size: Size!
+  }
+
+  type OrderListItem {
+    productId: ID!
+    quantity: Int!
+    size: Size!
   }
 
   type FashionNewsItem {
@@ -42,5 +68,27 @@ const typeDefs = gql`
     size: [Size!]!
     #created_at: Date!
   }
+
+  type Order {
+    id: ID!
+    consumer: String!
+    phone: String!
+    confirmed: Boolean!
+    received: Boolean!
+    createdAt: Date!
+    orderList: [OrderListItem!]!
+  }
+
+  interface User {
+    id: ID!
+    username: String!
+  }
+
+  type Seller implements User {
+    id: ID!
+    username: String!
+    isActive: Boolean!
+  }
 `;
+
 module.exports = typeDefs;

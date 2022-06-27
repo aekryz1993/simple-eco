@@ -4,6 +4,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/outline";
 import { Dir } from "./types";
 import { lastMove } from "./helper";
 import { forwardRef } from "react";
+import { size } from "styles";
 
 const Helper = forwardRef(
   (
@@ -30,7 +31,7 @@ export const SliderContainer = styled(Helper).attrs<{
     props.slider ? "flex h-full" : "w-full h-full"
   } relative overflow-hidden`,
 }))`
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: ${size.tablet}) {
     overflow-x: ${(props) => props.split && "auto"};
   }
 `;
@@ -68,9 +69,9 @@ export const SlideButton = styled(SlideButtonHelper).attrs({
   transform: translateY(-50%);
   background-color: rgba(255, 255, 255, 0.3);
   left: ${(props) =>
-    props.position === "left" && `${props.xMargin ? props.xMargin + 1 : 1}%`};
+    props.position === "left" && `${props.xMargin ? props.xMargin + 1 : 3}%`};
   right: ${(props) =>
-    props.position === "right" && `${props.xMargin ? props.xMargin + 1 : 1}%`};
+    props.position === "right" && `${props.xMargin ? props.xMargin + 1 : 3}%`};
   display: ${(props) => {
     if (props.xMargin && (props.pos || props.pos === 0)) {
       if (props.position === "left" && props.pos <= 0) return "none";
@@ -84,7 +85,7 @@ export const SlideButton = styled(SlideButtonHelper).attrs({
     }
   }};
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: ${size.tablet}) {
     display: ${(props) => props.xMargin && "none"};
   }
 `;
@@ -107,7 +108,7 @@ export const Main = styled.main.attrs<{
   xMargin?: number;
   dir: Dir;
 }>`
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: ${size.tablet}) {
     transition: ${(props) => props.split && props.pos && `none`};
     transform: ${(props) => props.split && props.pos && `none`};
   }
@@ -136,7 +137,7 @@ export const Main = styled.main.attrs<{
   }};
 `;
 
-export const CarouselSlot = styled.div.attrs<{
+export const CarouselSlot = styled.article.attrs<{
   slider?: string;
   split?: number;
 }>((props) => ({
@@ -151,7 +152,7 @@ export const CarouselSlot = styled.div.attrs<{
   xMargin?: number;
   slider?: string;
 }>`
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: ${size.tablet}) {
     flex: 0 0
       ${(props) =>
         props.split && props.xMargin

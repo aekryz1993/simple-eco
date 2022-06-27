@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import axios from "axios";
+import { checkexistFile, readJsonFile, writeToJsonFile } from "../database";
 import { generateFromEnum } from "../helper";
 
 export class Product {
@@ -31,23 +32,40 @@ export class Product {
   }
 }
 
-export const getProductItems = async () => {
-  const products = [...new Array(20)];
-  for (let idx in products) {
-    const product = new Product();
-    const main_image = await product.fetchRandomImg();
-    const images_list = [...new Array(4)].map(
-      async () => await product.fetchRandomImg()
-    );
-    products[idx] = {
-      ...product.productInfo(),
-      main_image,
-      images_list,
-    };
+export const createProductItems = async () => {
+  try {
+    await checkexistFile("fashionNews.json");
+  } catch (error) {
+    const products = [...new Array(20)];
+    for (let idx in products) {
+      const product = new Product();
+      const main_image = await product.fetchRandomImg();
+      let images_list = [...new Array(4)];
+      for (let index in images_list) {
+        const image = await product.fetchRandomImg();
+        images_list[index] = image;
+      }
+      products[idx] = {
+        ...product.productInfo(),
+        main_image,
+        images_list,
+      };
+    }
+    writeToJsonFile({
+      filename: "products.json",
+      data: products,
+    });
+
+    return products;
   }
+};
+
+export const getProductsItems = async () => {
+  const products = await readJsonFile("products.json");
   return products;
 };
 
-export const getProductItem = (products) => (id) => {
+export const getProductItem = async (id) => {
+  const products = await readJsonFile("products.json");
   return products.find((product) => product.id === id);
 };

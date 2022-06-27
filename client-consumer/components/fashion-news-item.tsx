@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const FashionNewsItem = ({ item }: { item: any }) => (
-  <article className="hover:opacity-80">
+  <div className="hover:opacity-80">
     <Image
       loader={({ src }) => src}
       key={item.id}
@@ -9,7 +9,7 @@ const FashionNewsItem = ({ item }: { item: any }) => (
       layout="fill"
       alt={item.img}
     />
-  </article>
+  </div>
 );
 
 export default FashionNewsItem;

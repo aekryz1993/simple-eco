@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import axios from "axios";
+import { checkexistFile, readJsonFile, writeToJsonFile } from "../database";
 
 export class FashionNewsItem {
   constructor() {
@@ -20,12 +21,27 @@ export class FashionNewsItem {
   }
 }
 
-export const getFashionNewsItems = async () => {
-  const fashionNews = [...new Array(3)];
-  for (let idx in fashionNews) {
-    const fashionNewsItem = new FashionNewsItem();
-    const img = await fashionNewsItem.fetchRandomImg();
-    fashionNews[idx] = { ...fashionNewsItem.fashionNewsItemInfo(), img };
+export const createFashionNewsItems = async () => {
+  try {
+    await checkexistFile("fashionNews.json");
+  } catch (error) {
+    const fashionNews = [...new Array(3)];
+    for (let idx in fashionNews) {
+      const fashionNewsItem = new FashionNewsItem();
+      const img = await fashionNewsItem.fetchRandomImg();
+      fashionNews[idx] = { ...fashionNewsItem.fashionNewsItemInfo(), img };
+    }
+
+    writeToJsonFile({
+      filename: "fashionNews.json",
+      data: fashionNews,
+    });
+
+    return fashionNews;
   }
+};
+
+export const getFashionNewsItems = async () => {
+  const fashionNews = await readJsonFile("fashionNews.json");
   return fashionNews;
 };

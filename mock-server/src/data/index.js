@@ -1,10 +1,12 @@
-import { getFashionNewsItems } from "./fashionNews";
-import { getProductItems, getProductItem } from "./products";
+import { createFashionNewsItems } from "./fashionNews";
+import { createProductItems, getProductItem } from "./products";
+// import { createOrder } from "./order";
 
 const data = {
-  getFashionNewsItems,
-  getProductItems,
+  createFashionNewsItems,
+  createProductItems,
   getProductItem,
+  // createOrder,
 };
 
 export default data;

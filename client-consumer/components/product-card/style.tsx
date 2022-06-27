@@ -35,7 +35,7 @@ export const ImageContainer = styled.div.attrs({
 `;
 
 export const TextContainer = styled.div.attrs({
-  className: "pt-2",
+  className: "py-4",
 })`
   height: 10%;
 `;
