@@ -1,26 +1,39 @@
-import { getProductItem } from "./data/products";
 import { PubSub } from "graphql-subscriptions";
-import { createOrder } from "./data/order";
 
 const pubsub = new PubSub();
 const subscriptions = {
   ORDER_ADDED: "ORDER_ADDED",
 };
 
-export const resolvers = async () => ({
+export const resolvers = {
   Query: {
-    product: async (_, { id }) => {
-      const product = await getProductItem(id);
-      return product;
-    },
+    fashionNews: async (_, __, { prisma }) =>
+      await prisma.fashionNewsItem.findMany(),
+    products: async (_, __, { prisma }) => await prisma.product.findMany(),
+    product: async (_, { id }, { prisma }) =>
+      await prisma.product.findUnique({
+        where: { id },
+      }),
   },
 
   Mutation: {
-    addOrder: async (_, { consumer, phone, orderList }) => {
-      const orderAdded = await createOrder({
-        consumer,
-        phone,
-        orderList,
+    addOrder: async (_, { consumer, phone, orderList }, { prisma }) => {
+      // const newOrderList = await prisma.orderListItem.create({
+      //   data: orderList,
+      // });
+      const orderAdded = await prisma.order.create({
+        data: {
+          consumer,
+          phone,
+          orderList: {
+            createMany: {
+              data: orderList,
+            },
+          },
+        },
+        include: {
+          orderList: true,
+        },
       });
 
       pubsub.publish(subscriptions.ORDER_ADDED, {
@@ -35,4 +48,10 @@ export const resolvers = async () => ({
       subscribe: () => pubsub.asyncIterator([subscriptions.ORDER_ADDED]),
     },
   },
-});
+
+  OrderListItem: {
+    productId: (parent) => parent.productId,
+    quantity: (parent) => parent.quantity,
+    size: (parent) => parent.size,
+  },
+};

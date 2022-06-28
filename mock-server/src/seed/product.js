@@ -1,6 +1,5 @@
 import { faker } from "@faker-js/faker";
 import axios from "axios";
-import { checkexistFile, readJsonFile, writeToJsonFile } from "../database";
 import { generateFromEnum } from "../helper";
 
 export class Product {
@@ -32,41 +31,25 @@ export class Product {
   }
 }
 
-export const createProductItems = async () => {
+export const initaiteProductItems = async (prisma) => {
   try {
-    await checkexistFile("products.json");
-  } catch (error) {
-    const products = [...new Array(20)];
-    for (let idx in products) {
+    const products = await prisma.product.findMany();
+    if (products.length > 0) return products;
+    return [...new Array(20)].map(async () => {
       const product = new Product();
       const main_image = await product.fetchRandomImg();
+
       let images_list = [...new Array(4)];
       for (let index in images_list) {
         const image = await product.fetchRandomImg();
         images_list[index] = image;
       }
-      console.log(images_list);
-      products[idx] = {
-        ...product.productInfo(),
-        main_image,
-        images_list,
-      };
-    }
-    await writeToJsonFile({
-      filename: "products.json",
-      data: products,
+
+      return await prisma.product.create({
+        data: { ...product.productInfo(), main_image, images_list },
+      });
     });
-
-    return products;
+  } catch (error) {
+    throw new Error(error);
   }
-};
-
-export const getProductsItems = async () => {
-  const products = await readJsonFile("products.json");
-  return products;
-};
-
-export const getProductItem = async (id) => {
-  const products = await readJsonFile("products.json");
-  return products.find((product) => product.id === id);
 };

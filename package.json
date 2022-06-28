@@ -6,8 +6,5 @@
     "dev": "(cd mock-server && npm run dev) & (cd client-consumer && npm run dev)"
   },
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "prisma": "^4.0.0"
-  }
+  "license": "ISC"
 }

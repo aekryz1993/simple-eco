@@ -1,0 +1,63 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model FashionNewsItem {
+  id  String @id @default(uuid())
+  img String
+}
+
+enum Size {
+  S
+  M
+  L
+  XL
+  XXL
+}
+
+model Product {
+  id               String   @id @default(uuid())
+  name             String
+  price            String
+  description      String
+  full_description String
+  main_image       String
+  images_list      String[]
+  Image            String[]
+  size             Size[]
+}
+
+model OrderListItem {
+  productId String  @id
+  quantity  Int
+  size      Size
+  Order     Order?  @relation(fields: [orderId], references: [id])
+  orderId   String?
+}
+
+model Order {
+  id        String          @id @default(uuid())
+  createdAt DateTime        @default(now())
+  consumer  String
+  phone     String
+  confirmed Boolean         @default(false)
+  received  Boolean         @default(false)
+  orderList OrderListItem[]
+}
+
+enum Role {
+  SELLER
+  CONSUMER
+}
+
+model User {
+  id       String  @id @default(uuid())
+  username String
+  role     Role[]
+  isActive Boolean @default(true)
+}

@@ -34,4 +34,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-database/*.json
+src/database/*.json
