@@ -32,7 +32,7 @@ export const createFashionNewsItems = async () => {
       fashionNews[idx] = { ...fashionNewsItem.fashionNewsItemInfo(), img };
     }
 
-    writeToJsonFile({
+    await writeToJsonFile({
       filename: "fashionNews.json",
       data: fashionNews,
     });

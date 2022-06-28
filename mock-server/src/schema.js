@@ -20,6 +20,7 @@ const typeDefs = gql`
       phone: String!
       orderList: [InputOrderListItem!]!
     ): Order!
+    login(username: String): String
   }
 
   type Subscription {
@@ -79,15 +80,22 @@ const typeDefs = gql`
     orderList: [OrderListItem!]!
   }
 
+  enum Role {
+    seller
+    consumer
+  }
+
   interface User {
     id: ID!
     username: String!
+    role: Role!
   }
 
   type Seller implements User {
     id: ID!
     username: String!
     isActive: Boolean!
+    role: Role!
   }
 `;
 

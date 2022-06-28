@@ -34,7 +34,7 @@ export class Product {
 
 export const createProductItems = async () => {
   try {
-    await checkexistFile("fashionNews.json");
+    await checkexistFile("products.json");
   } catch (error) {
     const products = [...new Array(20)];
     for (let idx in products) {
@@ -45,13 +45,14 @@ export const createProductItems = async () => {
         const image = await product.fetchRandomImg();
         images_list[index] = image;
       }
+      console.log(images_list);
       products[idx] = {
         ...product.productInfo(),
         main_image,
         images_list,
       };
     }
-    writeToJsonFile({
+    await writeToJsonFile({
       filename: "products.json",
       data: products,
     });

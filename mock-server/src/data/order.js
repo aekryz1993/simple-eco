@@ -1,6 +1,10 @@
 import { faker } from "@faker-js/faker";
-import { readJsonFile, writeToJsonFile } from "../database";
-import { getProductsItems } from "./products";
+import {
+  appendItemToJsonFile,
+  checkexistFile,
+  readJsonFile,
+  writeToJsonFile,
+} from "../database";
 
 export class Order {
   constructor({ consumer, phone, orderList }) {
@@ -23,14 +27,15 @@ export class Order {
 }
 
 export const createJSONOrderFile = async () => {
-  const filename = "orders.json";
   try {
-    await checkexistFile(filename);
+    await checkexistFile("orders.json");
   } catch (error) {
-    writeToJsonFile({
-      filename,
+    await writeToJsonFile({
+      filename: "orders.json",
       data: [],
     });
+
+    return;
   }
 };
 
@@ -39,21 +44,12 @@ export const getOrders = async () => {
   return orders;
 };
 
-export const addOrder = async (newOrder) => {
-  const orders = await getOrders();
-  const extendedOrders = [newOrder, ...orders];
-  writeToJsonFile({
-    filename: "orders.json",
-    data: extendedOrders,
-  });
-};
-
 export const createOrder = async ({ consumer, phone, orderList }) => {
-  const order = new Order({
+  const newOrder = new Order({
     consumer,
     phone,
     orderList,
   });
-  await addOrder(order);
-  return order;
+  appendItemToJsonFile("orders", newOrder);
+  return newOrder;
 };
