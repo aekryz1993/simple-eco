@@ -8,7 +8,7 @@ export class Product {
     this.name = faker.commerce.productName();
     this.price = faker.commerce.price(1500, 2000, 2, "DZD ");
     this.description = faker.lorem.sentences(2);
-    this.full_description = faker.lorem.paragraph();
+    this.fullDescription = faker.lorem.paragraph();
     this.size = generateFromEnum(["S", "M", "L", "XL", "XXL"])();
   }
 
@@ -25,7 +25,7 @@ export class Product {
       name: this.name,
       price: this.price,
       description: this.description,
-      full_description: this.full_description,
+      fullDescription: this.fullDescription,
       size: this.size,
     };
   }
@@ -37,16 +37,27 @@ export const initaiteProductItems = async (prisma) => {
     if (products.length > 0) return products;
     return [...new Array(20)].map(async () => {
       const product = new Product();
-      const main_image = await product.fetchRandomImg();
+      const mainImage = await product.fetchRandomImg();
 
-      let images_list = [...new Array(4)];
-      for (let index in images_list) {
-        const image = await product.fetchRandomImg();
-        images_list[index] = image;
+      let imagesList = [...new Array(4)];
+      for (let index in imagesList) {
+        const url = await product.fetchRandomImg();
+        imagesList[index] = { url };
       }
 
       return await prisma.product.create({
-        data: { ...product.productInfo(), main_image, images_list },
+        data: {
+          ...product.productInfo(),
+          mainImage,
+          imagesList: {
+            createMany: {
+              data: imagesList,
+            },
+          },
+        },
+        include: {
+          imagesList: true,
+        },
       });
     });
   } catch (error) {

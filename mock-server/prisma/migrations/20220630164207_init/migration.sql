@@ -2,7 +2,7 @@
 CREATE TYPE "Size" AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('SELLER', 'CONSUMER');
+CREATE TYPE "Role" AS ENUM ('Seller', 'Consumer');
 
 -- CreateTable
 CREATE TABLE "FashionNewsItem" (
@@ -13,15 +13,22 @@ CREATE TABLE "FashionNewsItem" (
 );
 
 -- CreateTable
+CREATE TABLE "Image" (
+    "id" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "productId" TEXT,
+
+    CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "full_description" TEXT NOT NULL,
-    "main_image" TEXT NOT NULL,
-    "images_list" TEXT[],
-    "Image" TEXT[],
+    "fullDescription" TEXT NOT NULL,
+    "mainImage" TEXT NOT NULL,
     "size" "Size"[],
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
@@ -29,12 +36,13 @@ CREATE TABLE "Product" (
 
 -- CreateTable
 CREATE TABLE "OrderListItem" (
-    "productId" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "size" "Size" NOT NULL,
-    "orderId" TEXT,
+    "orderId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
 
-    CONSTRAINT "OrderListItem_pkey" PRIMARY KEY ("productId")
+    CONSTRAINT "OrderListItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -45,7 +53,6 @@ CREATE TABLE "Order" (
     "phone" TEXT NOT NULL,
     "confirmed" BOOLEAN NOT NULL DEFAULT false,
     "received" BOOLEAN NOT NULL DEFAULT false,
-    "main_image" TEXT NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -54,11 +61,20 @@ CREATE TABLE "Order" (
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
-    "role" "Role"[],
+    "role" "Role" NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
 -- AddForeignKey
-ALTER TABLE "OrderListItem" ADD CONSTRAINT "OrderListItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Image" ADD CONSTRAINT "Image_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderListItem" ADD CONSTRAINT "OrderListItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderListItem" ADD CONSTRAINT "OrderListItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -4,7 +4,7 @@
   "description": "mock clothing store backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/index.js --ignore 'database/*.json'"
+    "dev": "nodemon --exec babel-node src/index.js"
   },
   "author": "Abdelkader Riazi",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "graphql": "^16.5.0",
     "graphql-subscriptions": "^2.0.0",
     "graphql-ws": "^5.9.0",
+    "jsonwebtoken": "^8.5.1",
     "ws": "^8.8.0"
   },
   "devDependencies": {

@@ -20,24 +20,33 @@ enum Size {
   XXL
 }
 
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+}
+
 model Product {
-  id               String   @id @default(uuid())
-  name             String
-  price            String
-  description      String
-  full_description String
-  main_image       String
-  images_list      String[]
-  Image            String[]
-  size             Size[]
+  id              String          @id @default(uuid())
+  name            String
+  price           String
+  description     String
+  fullDescription String
+  mainImage       String
+  imagesList      Image[]
+  size            Size[]
+  orderListItems  OrderListItem[]
 }
 
 model OrderListItem {
-  productId String  @id
+  id        String  @id @default(uuid())
   quantity  Int
   size      Size
-  Order     Order?  @relation(fields: [orderId], references: [id])
-  orderId   String?
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 }
 
 model Order {
@@ -51,13 +60,13 @@ model Order {
 }
 
 enum Role {
-  SELLER
-  CONSUMER
+  Seller
+  Consumer
 }
 
 model User {
   id       String  @id @default(uuid())
-  username String
-  role     Role[]
+  username String  @unique
+  role     Role
   isActive Boolean @default(true)
 }

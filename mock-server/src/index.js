@@ -3,16 +3,15 @@ import { createServer } from "http";
 import express from "express";
 import fs from "fs";
 import path from "path";
-import {
-  ApolloServerPluginDrainHttpServer,
-  AuthenticationError,
-} from "apollo-server-core";
+import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
+import { PubSub } from "graphql-subscriptions";
 
-import { resolvers } from "./resolvers";
+import { getDynamicContext, getUserId } from "./utils";
+import resolvers from "./resolvers";
 import seed from "./seed";
 
 const typeDefs = fs.readFileSync(
@@ -21,6 +20,7 @@ const typeDefs = fs.readFileSync(
 );
 
 const prisma = new PrismaClient();
+export const pubsub = new PubSub();
 
 async function initiateData() {
   await seed.initaiteFashionNewsItems(prisma);
@@ -45,22 +45,44 @@ async function startServer() {
       path: "/graphql",
     });
 
-    const serverCleanup = useServer({ schema }, wsServer);
+    const serverCleanup = useServer(
+      {
+        schema,
+        context: async (ctx, msg, args) => {
+          console.log(ctx.connectionParams);
+          const userAuth = await getDynamicContext({ ...prisma.user }, ctx);
+
+          return {
+            userAuth,
+            pubsub,
+          };
+        },
+        // onConnect: async (ctx) => {
+        //   console.log(ctx.connectionParams);
+        // },
+        // onDisconnect(ctx, code, reason) {
+        //   console.log("Disconnected!");
+        // },
+      },
+      wsServer
+    );
 
     const server = new ApolloServer({
       schema,
       csrfPrevention: true,
       cache: "bounded",
       context: async ({ req }) => {
-        const token = req.headers.authorization || "";
-        const userId = token.split(" ")[1];
-        // if (userId) {
-        //   const user = await login(userId).catch((error) => {
-        //     throw new AuthenticationError(error.message);
-        //   });
-        //   return { userId: user.id, userRole: user.role };
-        // }
-        return { prisma };
+        const user =
+          req &&
+          req.headers.authorization &&
+          (await getUserId(prisma.user, req));
+        return {
+          ...req,
+          prisma,
+          pubsub,
+          userId: user ? user.userId : null,
+          userRole: user ? user.userRole : null,
+        };
       },
       plugins: [
         ApolloServerPluginDrainHttpServer({ httpServer }),

@@ -17,7 +17,7 @@ type Mutation {
     phone: String!
     orderList: [InputOrderListItem!]!
   ): Order!
-  login(username: String): String
+  login(username: String): AuthPayload
 }
 
 type Subscription {
@@ -38,6 +38,11 @@ input InputOrderListItem {
   size: Size!
 }
 
+type AuthPayload {
+  token: String
+  user: User
+}
+
 type OrderListItem {
   productId: ID!
   quantity: Int!
@@ -51,6 +56,11 @@ type FashionNewsItem {
   #info: String
 }
 
+type Image {
+  id: ID!
+  url: String!
+}
+
 type Product {
   id: ID!
   name: String!
@@ -58,11 +68,11 @@ type Product {
   #old_price: Float
   #new_price: Float
   description: String
-  full_description: String
+  fullDescription: String
   #characteristics: [String]
   #reviews: [Revies]
-  main_image: String!
-  images_list: [String!]!
+  mainImage: String!
+  imagesList: [Image!]!
   size: [Size!]!
   #created_at: Date!
 }
@@ -78,8 +88,8 @@ type Order {
 }
 
 enum Role {
-  seller
-  consumer
+  Seller
+  Consumer
 }
 
 interface User {
@@ -92,5 +102,11 @@ type Seller implements User {
   id: ID!
   username: String!
   isActive: Boolean!
+  role: Role!
+}
+
+type Consumer implements User {
+  id: ID!
+  username: String!
   role: Role!
 }
