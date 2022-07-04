@@ -1,16 +1,18 @@
 export const subscriptions = {
-  ORDER_ADDED: "ORDER_ADDED",
+  CREATED_ORDER: "CREATED_ORDER",
 };
 
 function orderAddedSubscribe(context) {
-  return context.pubsub.asyncIterator([subscriptions.ORDER_ADDED]);
+  return context.pubsub.asyncIterator([subscriptions.CREATED_ORDER]);
 }
 
-const orderAdded = {
-  subscribe: (_, __, context) =>
-    context.userAuth &&
-    context.userAuth.userRole === "Seller" &&
-    orderAddedSubscribe(context),
+const createdOrder = {
+  subscribe: (_, __, context) => {
+    if (context.userAuth && context.userAuth.userRole === "Seller")
+      return orderAddedSubscribe(context);
+
+    throw new ForbiddenError("This operation is forbidden for Consumer");
+  },
 };
 
-export default { orderAdded };
+export default { createdOrder };

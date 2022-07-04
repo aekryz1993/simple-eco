@@ -42,7 +42,7 @@ async function startServer() {
 
     const wsServer = new WebSocketServer({
       server: httpServer,
-      path: "/graphql",
+      path: "/subscription",
     });
 
     const serverCleanup = useServer(

@@ -9,7 +9,7 @@ generator client {
 
 model FashionNewsItem {
   id  String @id @default(uuid())
-  img String
+  img Image?
 }
 
 enum Size {
@@ -21,42 +21,77 @@ enum Size {
 }
 
 model Image {
-  id        String   @id @default(uuid())
-  url       String
-  product   Product? @relation(fields: [productId], references: [id])
-  productId String?
+  id                 String           @id @default(uuid())
+  url                String
+  product            Product?         @relation("list", fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId          String?
+  productMainImage   Product?         @relation(fields: [mainImageProductId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  mainImageProductId String?          @unique
+  fashionNewsItem    FashionNewsItem? @relation(fields: [fashionNewsItemId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  fashionNewsItemId  String?          @unique
+}
+
+model Category {
+  id      String    @id @default(uuid())
+  name    String    @unique
+  product Product[]
+}
+
+enum Gender {
+  Male
+  Female
 }
 
 model Product {
-  id              String          @id @default(uuid())
+  id              String    @id @default(uuid())
   name            String
   price           String
   description     String
   fullDescription String
-  mainImage       String
-  imagesList      Image[]
+  category        Category? @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  categoryId      String?
+  gender          Gender
+  mainImage       Image?
+  imagesList      Image[]   @relation("list")
   size            Size[]
-  orderListItems  OrderListItem[]
+  bagItems        BagItem[]
+  createdAt       DateTime  @default(now())
 }
 
-model OrderListItem {
-  id        String  @id @default(uuid())
+model BagItem {
+  id        String   @id @default(uuid())
   quantity  Int
   size      Size
-  order     Order   @relation(fields: [orderId], references: [id])
-  orderId   String
-  product   Product @relation(fields: [productId], references: [id])
+  order     Order?   @relation(fields: [orderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  orderId   String?
+  product   Product  @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   productId String
+  bag       Bag?     @relation(fields: [bagId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  bagId     String?
+  createdAt DateTime @default(now())
+}
+
+model Bag {
+  id          String    @id @default(uuid())
+  user        User?     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId      String?   @unique
+  bagItems    BagItem[]
+  anonymousId String?   @unique
+  expires     DateTime?
+  inSession   Boolean?
 }
 
 model Order {
-  id        String          @id @default(uuid())
-  createdAt DateTime        @default(now())
-  consumer  String
-  phone     String
-  confirmed Boolean         @default(false)
-  received  Boolean         @default(false)
-  orderList OrderListItem[]
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  consumerName String
+  phone        String
+  confirmed    Boolean   @default(false)
+  received     Boolean   @default(false)
+  totalPrice   String
+  orderItems   BagItem[]
+  user         User?     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId       String?
 }
 
 enum Role {
@@ -65,8 +100,11 @@ enum Role {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  username String  @unique
-  role     Role
-  isActive Boolean @default(true)
+  id        String   @id @default(uuid())
+  username  String   @unique
+  role      Role
+  isActive  Boolean  @default(true)
+  bag       Bag?
+  order     Order[]
+  createdAt DateTime @default(now())
 }

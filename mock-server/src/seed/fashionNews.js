@@ -8,7 +8,7 @@ export class FashionNewsItem {
 
   async fetchRandomImg() {
     const response = await axios.get(
-      "https://source.unsplash.com/random/2000x1000/?women&clothing&fashion&background"
+      "https://source.unsplash.com/random/2000x1000/?clothing-fashion"
     );
     return response.request.res.responseUrl;
   }
@@ -26,9 +26,12 @@ export const initaiteFashionNewsItems = async (prisma) => {
     if (fashionNews.length > 0) return fashionNews;
     return [...new Array(3)].map(async () => {
       const fashionNewsItem = new FashionNewsItem();
-      const img = await fashionNewsItem.fetchRandomImg();
+      const imgUrl = await fashionNewsItem.fetchRandomImg();
       return await prisma.fashionNewsItem.create({
-        data: { ...fashionNewsItem.fashionNewsItemInfo(), img },
+        data: {
+          ...fashionNewsItem.fashionNewsItemInfo(),
+          img: { create: { url: imgUrl } },
+        },
       });
     });
   } catch (error) {

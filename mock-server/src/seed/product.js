@@ -3,18 +3,20 @@ import axios from "axios";
 import { generateFromEnum } from "../helper";
 
 export class Product {
-  constructor() {
+  constructor(gender, category) {
     this.id = faker.datatype.uuid();
     this.name = faker.commerce.productName();
     this.price = faker.commerce.price(1500, 2000, 2, "DZD ");
     this.description = faker.lorem.sentences(2);
     this.fullDescription = faker.lorem.paragraph();
+    this.gender = gender;
+    this.category = category;
     this.size = generateFromEnum(["S", "M", "L", "XL", "XXL"])();
   }
 
-  async fetchRandomImg() {
+  async fetchRandomImg(query) {
     const response = await axios.get(
-      "https://source.unsplash.com/random/2000x1000/?woman&clothing"
+      `https://source.unsplash.com/random/2000x1000/?${query}`
     );
     return response.request.res.responseUrl;
   }
@@ -27,6 +29,7 @@ export class Product {
       description: this.description,
       fullDescription: this.fullDescription,
       size: this.size,
+      gender: this.gender,
     };
   }
 }
@@ -35,31 +38,59 @@ export const initaiteProductItems = async (prisma) => {
   try {
     const products = await prisma.product.findMany();
     if (products.length > 0) return products;
-    return [...new Array(20)].map(async () => {
-      const product = new Product();
-      const mainImage = await product.fetchRandomImg();
-
-      let imagesList = [...new Array(4)];
-      for (let index in imagesList) {
-        const url = await product.fetchRandomImg();
-        imagesList[index] = { url };
-      }
-
-      return await prisma.product.create({
-        data: {
-          ...product.productInfo(),
-          mainImage,
-          imagesList: {
-            createMany: {
-              data: imagesList,
+    const queries = [
+      "shirt-male",
+      "shirt-female",
+      "shoe-male",
+      "shoe-female",
+      "pant-male",
+      "jean-male",
+      "pant-female",
+      "robe-female",
+    ];
+    for (let query of queries) {
+      const categoryName =
+        query.split("-")[0].charAt(0).toUpperCase() +
+        query.split("-")[0].slice(1);
+      const gender =
+        query.split("-")[1].charAt(0).toUpperCase() +
+        query.split("-")[1].slice(1);
+      [...new Array(5)].forEach(async () => {
+        const product = new Product(gender, categoryName);
+        const mainImageUrl = await product.fetchRandomImg(query);
+        let imagesList = [...new Array(4)];
+        for (let index in imagesList) {
+          const url = await product.fetchRandomImg(query);
+          imagesList[index] = { url };
+        }
+        await prisma.product.create({
+          data: {
+            ...product.productInfo(),
+            mainImage: {
+              create: {
+                url: mainImageUrl,
+              },
+            },
+            category: {
+              connectOrCreate: {
+                where: { name: categoryName },
+                create: { name: categoryName },
+              },
+            },
+            imagesList: {
+              createMany: {
+                data: imagesList,
+              },
             },
           },
-        },
-        include: {
-          imagesList: true,
-        },
+          include: {
+            mainImage: true,
+            category: true,
+            imagesList: true,
+          },
+        });
       });
-    });
+    }
   } catch (error) {
     throw new Error(error);
   }

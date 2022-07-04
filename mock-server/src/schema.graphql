@@ -1,27 +1,32 @@
 scalar Date
 
 type Query {
-  "Get fashionNews array for homepage slider"
   fashionNews: [FashionNewsItem!]!
-  "Get products array"
   products: [Product!]!
-  "Get Orders"
-  orders: [Order!]!
-  "Get product"
-  product(id: ID!): Product!
+  orders: Order!
+  product(id: ID!): Product
+  bag(anonymousId: ID): Bag!
 }
 
 type Mutation {
-  addOrder(
-    consumer: String!
+  createOrder(
+    username: String
     phone: String!
-    orderList: [InputOrderListItem!]!
-  ): Order!
+    totalPrice: String!
+    orderItems: [InputOrderListItem!]!
+  ): Order
   login(username: String): AuthPayload
+  createOrFindBag(anonymousId: ID): Bag
+  addItemToBag(
+    productId: ID!
+    anonymousId: ID
+    quantity: Int!
+    size: Size!
+  ): BagItem
 }
 
 type Subscription {
-  orderAdded: Order!
+  createdOrder: Order
 }
 
 enum Size {
@@ -32,21 +37,45 @@ enum Size {
   XXL
 }
 
-input InputOrderListItem {
-  productId: ID!
-  quantity: Int!
-  size: Size!
-}
-
 type AuthPayload {
   token: String
   user: User
 }
 
-type OrderListItem {
-  productId: ID!
+input InputOrderListItem {
+  bagItemId: ID!
   quantity: Int!
   size: Size!
+}
+
+type BagItem {
+  id: ID!
+  product: Product!
+  bagId: ID
+  orderId: ID
+  quantity: Int!
+  size: Size!
+}
+
+type Bag {
+  id: ID!
+  userId: ID
+  bagItems: [BagItem]
+  anonymousId: ID
+  expires: Date
+  inSession: Boolean
+}
+
+type Order {
+  id: ID!
+  consumerName: String!
+  user: Consumer
+  phone: String!
+  totalPrice: String!
+  confirmed: Boolean!
+  received: Boolean!
+  createdAt: Date!
+  orderItems: [BagItem]
 }
 
 type FashionNewsItem {
@@ -61,6 +90,16 @@ type Image {
   url: String!
 }
 
+enum Gender {
+  Male
+  Female
+}
+
+type Category {
+  id: ID!
+  name: String!
+}
+
 type Product {
   id: ID!
   name: String!
@@ -71,20 +110,12 @@ type Product {
   fullDescription: String
   #characteristics: [String]
   #reviews: [Revies]
-  mainImage: String!
+  mainImage: Image!
   imagesList: [Image!]!
   size: [Size!]!
-  #created_at: Date!
-}
-
-type Order {
-  id: ID!
-  consumer: String!
-  phone: String!
-  confirmed: Boolean!
-  received: Boolean!
+  category: Category!
+  gender: Gender!
   createdAt: Date!
-  orderList: [OrderListItem!]!
 }
 
 enum Role {
@@ -96,6 +127,7 @@ interface User {
   id: ID!
   username: String!
   role: Role!
+  createdAt: Date!
 }
 
 type Seller implements User {
@@ -103,10 +135,14 @@ type Seller implements User {
   username: String!
   isActive: Boolean!
   role: Role!
+  createdAt: Date!
 }
 
 type Consumer implements User {
   id: ID!
   username: String!
   role: Role!
+  bag: Bag!
+  phone: String
+  createdAt: Date!
 }

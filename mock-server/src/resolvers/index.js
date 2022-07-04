@@ -4,6 +4,8 @@ import Subscription from "./Subscription";
 import Order from "./Order";
 import Product from "./Product";
 import User from "./User";
+import Bag from "./Bag";
+import BagItem from "./BagItem";
 
 export default {
   Query,
@@ -12,4 +14,6 @@ export default {
   Order,
   Product,
   User,
+  Bag,
+  BagItem,
 };
