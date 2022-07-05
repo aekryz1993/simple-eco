@@ -2,19 +2,13 @@ scalar Date
 
 type Query {
   fashionNews: [FashionNewsItem!]!
-  products: [Product!]!
-  orders: Order!
+  products(filter: productFilter, search: String): [Product!]!
+  orders: [Order!]!
   product(id: ID!): Product
   bag(anonymousId: ID): Bag!
 }
 
 type Mutation {
-  createOrder(
-    username: String
-    phone: String!
-    totalPrice: String!
-    orderItems: [InputOrderListItem!]!
-  ): Order
   login(username: String): AuthPayload
   createOrFindBag(anonymousId: ID): Bag
   addItemToBag(
@@ -23,10 +17,36 @@ type Mutation {
     quantity: Int!
     size: Size!
   ): BagItem
+  createOrder(
+    username: String
+    phone: String
+    totalPrice: Float!
+    orderItems: [InputOrderListItem!]!
+  ): Order
+  orderNow(
+    username: String
+    phone: String
+    totalPrice: Float!
+    orderItem: InputOrderNowProduct!
+  ): Order
 }
 
 type Subscription {
   createdOrder: Order
+}
+
+enum Sort {
+  asc
+  desc
+}
+
+input productFilter {
+  take: Int
+  gender: Gender
+  category: String
+  price: Sort
+  date: Sort
+  name: String
 }
 
 enum Size {
@@ -40,6 +60,12 @@ enum Size {
 type AuthPayload {
   token: String
   user: User
+}
+
+input InputOrderNowProduct {
+  productId: ID!
+  quantity: Int!
+  size: Size!
 }
 
 input InputOrderListItem {
@@ -71,17 +97,18 @@ type Order {
   consumerName: String!
   user: Consumer
   phone: String!
-  totalPrice: String!
+  totalPrice: Float!
   confirmed: Boolean!
   received: Boolean!
   createdAt: Date!
   orderItems: [BagItem]
+  orderItem: Product
 }
 
 type FashionNewsItem {
   id: ID!
   #title: String!
-  img: String!
+  img: Image!
   #info: String
 }
 
@@ -103,7 +130,7 @@ type Category {
 type Product {
   id: ID!
   name: String!
-  price: String!
+  price: Float!
   #old_price: Float
   #new_price: Float
   description: String

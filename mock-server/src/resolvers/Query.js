@@ -1,11 +1,46 @@
-import { UserInputError } from "apollo-server-core";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  UserInputError,
+} from "apollo-server-core";
 
 function fashionNews(_, __, { prisma }) {
   return prisma.fashionNewsItem.findMany();
 }
 
-function products(_, __, { prisma }) {
-  return prisma.product.findMany();
+function products(_, { filter, search }, { prisma }) {
+  if (!filter && !search) return prisma.product.findMany();
+
+  if (search)
+    return prisma.product.findMany({
+      where: {
+        OR: [
+          { name: { search } },
+          { description: { search } },
+          { fullDescription: { search } },
+        ],
+      },
+    });
+
+  const orderBy = filter.price
+    ? { price: filter.price }
+    : filter.date
+    ? { createdAt: filter.date }
+    : { createdAt: "desc" };
+  return prisma.product.findMany({
+    take: filter.take,
+    where: {
+      AND: [{ gender: filter.gender }, { category: { name: filter.category } }],
+    },
+    orderBy,
+  });
+}
+
+function orders(_, __, { prisma, userId, userRole }) {
+  if (!userId) throw new AuthenticationError("User doesn't autheticated");
+  if (userRole !== "Seller")
+    throw new ForbiddenError("This operation is forbidden for Consumer");
+  return prisma.order.findMany();
 }
 
 async function product(_, { id }, { prisma }) {
@@ -35,4 +70,5 @@ export default {
   products,
   product,
   bag,
+  orders,
 };

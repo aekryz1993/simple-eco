@@ -91,17 +91,33 @@ async function createOrder(
   { username, phone, totalPrice, orderItems },
   { prisma, pubsub, userId, userRole }
 ) {
-  const consumerName =
-    username ||
-    (await prisma.user.findUnique({ where: { id: userId } }).username());
+  for (let orderItem of orderItems) {
+    const item = await prisma.bagItem.findUnique({
+      where: { id: orderItem.bagItemId },
+    });
+    if (!item || !item.bagId)
+      throw new UserInputError(
+        `${orderItem.bagItemId} doesn't exist in the bag`
+      );
+  }
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user && (!username || !phone))
+    throw new UserInputError(`username and phone are required`);
 
   const createdOrder =
     (!userId || userRole === "Consumer") &&
     (await prisma.order.create({
       data: {
-        consumerName,
-        phone,
+        consumerName: username || user.username,
+        phone: phone || user.phone,
         totalPrice,
+        user: user
+          ? {
+              connect: {
+                id: user.id,
+              },
+            }
+          : null,
       },
     }));
 
@@ -116,7 +132,7 @@ async function createOrder(
       });
     }
 
-    pubsub.publish(subscriptions.ORDER_ADDED, {
+    pubsub.publish(subscriptions.CREATED_ORDER, {
       createdOrder,
     });
 
@@ -127,4 +143,51 @@ async function createOrder(
     throw new ForbiddenError("This operation is forbidden for Admin");
 }
 
-export default { login, createOrFindBag, addItemToBag, createOrder };
+async function orderNow(
+  _,
+  { username, phone, totalPrice, orderItem },
+  { prisma, pubsub, userId, userRole }
+) {
+  const product = await prisma.product.findUnique({
+    where: { id: orderItem.productId },
+  });
+  if (!product)
+    throw new UserInputError(`${orderItem.productId} doesn't exist`);
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user && (!username || !phone))
+    throw new UserInputError(`username and phone are required`);
+
+  const createdOrder =
+    (!userId || userRole === "Consumer") &&
+    (await prisma.order.create({
+      data: {
+        consumerName: username || user.username,
+        phone: phone || user.phone,
+        totalPrice,
+        user: user
+          ? {
+              connect: {
+                id: user.id,
+              },
+            }
+          : null,
+        quantity: orderItem.quantity,
+        size: orderItem.size,
+        orderItem: { connect: { id: orderItem.productId } },
+      },
+    }));
+
+  if (createOrder) {
+    pubsub.publish(subscriptions.CREATED_ORDER, {
+      createdOrder,
+    });
+
+    return createdOrder;
+  }
+
+  if (userId && userRole === "Seller")
+    throw new ForbiddenError("This operation is forbidden for Admin");
+}
+
+export default { login, createOrFindBag, addItemToBag, createOrder, orderNow };

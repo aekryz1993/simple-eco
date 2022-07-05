@@ -6,7 +6,7 @@ export class Product {
   constructor(gender, category) {
     this.id = faker.datatype.uuid();
     this.name = faker.commerce.productName();
-    this.price = faker.commerce.price(1500, 2000, 2, "DZD ");
+    this.price = parseFloat(faker.commerce.price(1500, 2000));
     this.description = faker.lorem.sentences(2);
     this.fullDescription = faker.lorem.paragraph();
     this.gender = gender;

@@ -33,17 +33,12 @@ export async function getUserId(userQuery, req, authToken) {
 }
 
 export async function getDynamicContext(userQuery, ctx) {
-  try {
-    const authHeader = ctx.connectionParams.Authorization;
-    if (!authHeader) return null;
-    const token = authHeader.replace("Bearer ", "");
-    if (!token) {
-      throw new AuthenticationError("No token found");
-    }
-    const { userId, userRole } = await getUserId(userQuery, undefined, token);
-    return { userId, userRole };
-  } catch (error) {
-    console.log(error);
-    return { error: error.message };
+  const authHeader = ctx.connectionParams.Authorization;
+  if (!authHeader) return null;
+  const token = authHeader.replace("Bearer ", "");
+  if (!token) {
+    throw new AuthenticationError("No token found");
   }
+  const { userId, userRole } = await getUserId(userQuery, undefined, token);
+  return { userId, userRole };
 }

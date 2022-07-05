@@ -19,7 +19,7 @@ export const initaiteUserItems = async (prisma) => {
       data: user1,
     });
     await prisma.user.create({
-      data: { ...user2, bag: { create: {} } },
+      data: { ...user2, phone: "0778888888", bag: { create: {} } },
     });
   } catch (error) {
     throw new Error(error);

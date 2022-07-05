@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 model FashionNewsItem {
@@ -45,7 +46,7 @@ enum Gender {
 model Product {
   id              String    @id @default(uuid())
   name            String
-  price           String
+  price           Float
   description     String
   fullDescription String
   category        Category? @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -56,6 +57,7 @@ model Product {
   size            Size[]
   bagItems        BagItem[]
   createdAt       DateTime  @default(now())
+  Order           Order[]
 }
 
 model BagItem {
@@ -86,10 +88,14 @@ model Order {
   createdAt    DateTime  @default(now())
   consumerName String
   phone        String
+  quantity     Int
+  size         Size
   confirmed    Boolean   @default(false)
   received     Boolean   @default(false)
-  totalPrice   String
+  totalPrice   Float
   orderItems   BagItem[]
+  orderItem    Product?  @relation(fields: [productId], references: [id])
+  productId    String?
   user         User?     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId       String?
 }
@@ -102,6 +108,7 @@ enum Role {
 model User {
   id        String   @id @default(uuid())
   username  String   @unique
+  phone     String?
   role      Role
   isActive  Boolean  @default(true)
   bag       Bag?

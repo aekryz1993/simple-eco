@@ -49,7 +49,6 @@ async function startServer() {
       {
         schema,
         context: async (ctx, msg, args) => {
-          console.log(ctx.connectionParams);
           const userAuth = await getDynamicContext({ ...prisma.user }, ctx);
 
           return {
